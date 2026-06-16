@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculadora de INSS 2026 | Desconto na folha (tabela progressiva)</title>
+  <meta name="description" content="Calculadora de INSS 2026 gratuita. Descubra quanto é descontado do seu salário pela tabela progressiva atualizada (7,5% a 14%), faixa por faixa, com o teto de 2026.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-inss">
+
+  <meta property="og:title" content="Calculadora de INSS 2026">
+  <meta property="og:description" content="Calcule o desconto do INSS no seu salário pela tabela progressiva de 2026.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* CSS BASE — idêntico às outras ferramentas */
+    :root {
+      --bg: #0f1115;
+      --surface: #181b22;
+      --surface-2: #1f232c;
+      --border: #2a2f3a;
+      --text: #e8eaed;
+      --text-dim: #9aa0ab;
+      --accent: #4ade80;
+      --accent-dim: #22c55e;
+      --radius: 14px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.6; padding: 1.25rem;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .container { width: 100%; max-width: 760px; }
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+    .tool {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .field { margin-bottom: 1.1rem; }
+    label {
+      display: block; font-size: 0.9rem; color: var(--text-dim);
+      margin-bottom: 0.4rem; font-weight: 500;
+    }
+    input, select {
+      width: 100%; padding: 0.75rem 0.9rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+      font-size: 1rem; font-family: inherit; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    button {
+      width: 100%; padding: 0.85rem; background: var(--accent); color: #06210f;
+      border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s;
+    }
+    button:hover { background: var(--accent-dim); }
+    .result {
+      margin-top: 1.5rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border); display: none;
+    }
+    .result.show { display: block; }
+    .result-main { text-align: center; margin-bottom: 1.25rem; }
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+    .result-value {
+      font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 700;
+      color: var(--accent); letter-spacing: -0.02em;
+    }
+    .breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .breakdown-item {
+      background: var(--surface-2); border-radius: 10px; padding: 0.9rem; text-align: center;
+    }
+    .breakdown-item .v { font-size: 1.15rem; font-weight: 700; }
+    .breakdown-item .l { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    /* Detalhamento por faixa */
+    .faixas {
+      margin-top: 1.25rem; background: var(--surface-2);
+      border-radius: 10px; padding: 0.5rem 0.25rem;
+    }
+    .faixa-linha {
+      display: flex; justify-content: space-between;
+      padding: 0.55rem 0.9rem; font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .faixa-linha:last-child { border-bottom: none; }
+    .faixa-linha .desc { color: var(--text-dim); }
+    .faixa-linha .val { font-weight: 600; }
+    .faixa-linha.zero { opacity: 0.4; }
+
+    .content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.6rem; margin-bottom: 2rem;
+    }
+    .content h2 { font-size: 1.25rem; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+    .content table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1rem; font-size: 0.9rem; }
+    .content th, .content td { padding: 0.5rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+    .content th { color: var(--text-dim); font-weight: 600; }
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+    footer {
+      text-align: center; color: var(--text-dim);
+      font-size: 0.85rem; padding: 1rem 0 2rem;
+    }
+    @media (max-width: 480px) { .breakdown { grid-template-columns: 1fr; } }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de INSS 2026</h1>
+      <p class="subtitle">Descubra quanto é descontado do seu salário pela tabela progressiva</p>
+    </header>
+
+    <section class="tool" aria-label="Calculadora de INSS">
+      <div class="field">
+        <label for="salario">Salário bruto (R$)</label>
+        <input type="number" id="salario" value="3000" min="0" step="0.01">
+      </div>
+
+      <button id="calcular">Calcular INSS</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Desconto de INSS</div>
+          <div class="result-value" id="desconto">R$ 0,00</div>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <div class="v" id="aliq-efetiva">0%</div>
+            <div class="l">Alíquota efetiva</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="v" id="liquido-parcial" style="color: var(--accent);">R$ 0,00</div>
+            <div class="l">Salário menos INSS</div>
+          </div>
+        </div>
+
+        <div class="faixas" id="faixas"></div>
+      </div>
+    </section>
+
+    <article class="content">
+      <h2>Como funciona o desconto do INSS em 2026</h2>
+      <p>O INSS é descontado de forma progressiva: o salário é dividido em faixas e cada faixa tem uma alíquota própria, aplicada apenas sobre a parte do salário que se enquadra nela. Não é uma alíquota única sobre o salário todo. Por isso, mesmo quem ganha mais paga 7,5% sobre a primeira faixa, como todo mundo.</p>
+
+      <h2>Tabela INSS 2026</h2>
+      <table>
+        <thead>
+          <tr><th>Faixa salarial</th><th>Alíquota</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Até R$ 1.621,00</td><td>7,5%</td></tr>
+          <tr><td>De R$ 1.621,01 a R$ 2.902,84</td><td>9%</td></tr>
+          <tr><td>De R$ 2.902,85 a R$ 4.354,27</td><td>12%</td></tr>
+          <tr><td>De R$ 4.354,28 a R$ 8.475,55</td><td>14%</td></tr>
+        </tbody>
+      </table>
+      <p>O teto do INSS em 2026 é de R$ 8.475,55. Salários acima desse valor contribuem apenas até o teto, o que limita o desconto máximo a R$ 988,09 por mês.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>Quem ganha acima do teto paga mais?</strong>
+        Não. Independente de quanto a pessoa ganhe acima de R$ 8.475,55, o desconto máximo é de R$ 988,09 — o INSS só incide até o teto.
+      </div>
+      <div class="faq-item">
+        <strong>O que é a alíquota efetiva?</strong>
+        É o desconto real em relação ao salário. Como o cálculo é progressivo, ela é sempre menor que a alíquota da faixa mais alta atingida.
+      </div>
+      <div class="faq-item">
+        <strong>Esse desconto serve para calcular o salário líquido?</strong>
+        Sim, o INSS é o primeiro desconto. Depois ainda incide o Imposto de Renda (IRRF), calculado sobre o salário já descontado o INSS.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-salario-liquido">Salário Líquido</a>
+        <a href="/calculadora-ferias">Férias</a>
+        <a href="/calculadora-rescisao">Rescisão</a>
+        <a href="/calculadora-juros-compostos">Juros Compostos</a>
+        <a href="/calculadora-financiamento">Financiamento</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Valores da tabela INSS vigente em 2026. Confira sempre seu holerite oficial.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // INSS 2026 — tabela progressiva
+    // Fonte: Portaria Interministerial MPS/MF nº 26/2026
+    // Cálculo em CENTAVOS inteiros.
+    // ⚠️ ATUALIZAR ANUALMENTE: faixas, teto e desconto máximo mudam todo ano.
+    // ============================================================
+
+    const FAIXAS = [
+      { limite: 162100, aliq: 0.075, rotulo: '7,5%' },  // até 1.621,00
+      { limite: 290284, aliq: 0.09,  rotulo: '9%'   },  // até 2.902,84
+      { limite: 435427, aliq: 0.12,  rotulo: '12%'  },  // até 4.354,27
+      { limite: 847555, aliq: 0.14,  rotulo: '14%'  },  // até 8.475,55 (teto)
+    ];
+    const TETO_SALARIO = 847555;   // R$ 8.475,55 em centavos
+    const TETO_DESCONTO = 98809;   // R$ 988,09 em centavos (desconto máximo oficial)
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    function calcular() {
+      const salarioReais = parseFloat(document.getElementById('salario').value) || 0;
+      let sc = Math.round(salarioReais * 100);
+      const scOriginal = sc;
+      if (sc > TETO_SALARIO) sc = TETO_SALARIO;
+
+      let total = 0;
+      let anterior = 0;
+      const detalhe = [];
+
+      for (const f of FAIXAS) {
+        let parcela = 0;
+        if (sc > anterior) {
+          const base = Math.min(sc, f.limite) - anterior;
+          parcela = Math.round(base * f.aliq);
+          total += parcela;
+        }
+        detalhe.push({ rotulo: f.rotulo, parcela });
+        anterior = f.limite;
+      }
+
+      // Trava no desconto máximo oficial
+      if (total > TETO_DESCONTO) total = TETO_DESCONTO;
+
+      // Alíquota efetiva sobre o salário real (não o limitado)
+      const aliqEfetiva = scOriginal > 0 ? (total / scOriginal) * 100 : 0;
+      const liquidoParcial = scOriginal - total;
+
+      // Exibe
+      document.getElementById('desconto').textContent = fmt.format(total / 100);
+      document.getElementById('aliq-efetiva').textContent = aliqEfetiva.toFixed(2).replace('.', ',') + '%';
+      document.getElementById('liquido-parcial').textContent = fmt.format(liquidoParcial / 100);
+
+      // Detalhamento por faixa
+      const elFaixas = document.getElementById('faixas');
+      elFaixas.innerHTML = detalhe.map(d =>
+        `<div class="faixa-linha ${d.parcela === 0 ? 'zero' : ''}">
+          <span class="desc">Faixa ${d.rotulo}</span>
+          <span class="val">${fmt.format(d.parcela / 100)}</span>
+        </div>`
+      ).join('');
+
+      document.getElementById('result').classList.add('show');
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+    document.getElementById('salario').addEventListener('keydown', e => {
+      if (e.key === 'Enter') calcular();
+    });
+
+    calcular();
+  </script>
+</body>
+</html>

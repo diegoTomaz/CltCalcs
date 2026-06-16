@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculadora de Financiamento | Simule parcelas e juros (Tabela Price)</title>
+  <meta name="description" content="Calculadora de financiamento gratuita. Calcule o valor da parcela, o total de juros e veja a tabela de amortização mês a mês pela Tabela Price. Imóvel, carro ou empréstimo.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-financiamento">
+
+  <meta property="og:title" content="Calculadora de Financiamento">
+  <meta property="og:description" content="Calcule parcelas, juros totais e veja a tabela de amortização mês a mês.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* ============================================================
+       CSS BASE — o MESMO da calculadora de juros compostos.
+       Mantenha idêntico em todas as ferramentas para consistência.
+       ============================================================ */
+
+    :root {
+      --bg: #0f1115;
+      --surface: #181b22;
+      --surface-2: #1f232c;
+      --border: #2a2f3a;
+      --text: #e8eaed;
+      --text-dim: #9aa0ab;
+      --accent: #4ade80;
+      --accent-dim: #22c55e;
+      --radius: 14px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container { width: 100%; max-width: 760px; }
+
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+
+    .tool {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #06210f;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    button:hover { background: var(--accent-dim); }
+
+    .result {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+
+    .result.show { display: block; }
+
+    .result-main { text-align: center; margin-bottom: 1.25rem; }
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+
+    .result-value {
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    .breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .breakdown-item {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 0.9rem;
+      text-align: center;
+    }
+
+    .breakdown-item .v { font-size: 1.15rem; font-weight: 700; }
+    .breakdown-item .l { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    /* ===== Tabela de amortização (específico desta ferramenta) ===== */
+    .tabela-wrap {
+      margin-top: 1.5rem;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+    th, td {
+      padding: 0.6rem 0.7rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--surface-2);
+      color: var(--text-dim);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child { text-align: center; }
+
+    tbody tr { border-top: 1px solid var(--border); }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+
+    .toggle-tabela {
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+    .toggle-tabela:hover { background: var(--border); }
+
+    .content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .content h2 { font-size: 1.25rem; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+
+    footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      padding: 1rem 0 2rem;
+    }
+
+    @media (max-width: 480px) {
+      .row, .breakdown { grid-template-columns: 1fr; }
+    }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de Financiamento</h1>
+      <p class="subtitle">Calcule a parcela, os juros totais e veja a amortização mês a mês</p>
+    </header>
+
+    <section class="tool" aria-label="Calculadora de financiamento">
+      <div class="field">
+        <label for="valor">Valor financiado (R$)</label>
+        <input type="number" id="valor" value="100000" min="0" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="taxa">Taxa de juros (%)</label>
+          <input type="number" id="taxa" value="1" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="periodo-taxa">Período da taxa</label>
+          <select id="periodo-taxa">
+            <option value="mensal">Mensal</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="parcelas">Número de parcelas (meses)</label>
+        <input type="number" id="parcelas" value="360" min="1" step="1">
+      </div>
+
+      <button id="calcular">Calcular</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Valor da parcela mensal</div>
+          <div class="result-value" id="parcela">R$ 0,00</div>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <div class="v" id="total-pago">R$ 0,00</div>
+            <div class="l">Total pago</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="v" id="total-juros" style="color: var(--accent);">R$ 0,00</div>
+            <div class="l">Total de juros</div>
+          </div>
+        </div>
+
+        <button class="toggle-tabela" id="toggle-tabela" type="button">Ver tabela de amortização</button>
+
+        <div class="tabela-wrap" id="tabela-wrap" style="display:none;">
+          <table>
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th>Parcela</th>
+                <th>Juros</th>
+                <th>Amortização</th>
+                <th>Saldo devedor</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <article class="content">
+      <h2>Como funciona o financiamento pela Tabela Price?</h2>
+      <p>A Tabela Price é o sistema de amortização mais comum no Brasil para financiamentos. Nela, todas as parcelas têm o mesmo valor do início ao fim. No começo, a maior parte da parcela é composta por juros e uma parte menor abate a dívida; com o tempo, essa proporção se inverte — você passa a pagar mais amortização e menos juros.</p>
+
+      <h2>Como usar esta calculadora</h2>
+      <p>Informe o valor que será financiado, a taxa de juros (mensal ou anual, conforme o banco informa) e em quantas parcelas você pretende pagar. A calculadora mostra o valor de cada parcela, quanto você vai pagar no total e quanto disso são apenas juros. Clique em "ver tabela de amortização" para acompanhar a evolução do saldo devedor mês a mês.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>A taxa do banco costuma ser mensal ou anual?</strong>
+        Os bancos costumam divulgar as duas. Use a opção correspondente — uma taxa de 12% ao ano não é igual a 1% ao mês exatamente, por causa dos juros compostos.
+      </div>
+      <div class="faq-item">
+        <strong>Por que pago tanto juros no início?</strong>
+        Porque os juros incidem sobre o saldo devedor, que é maior no começo. Conforme você amortiza, o saldo cai e a parte de juros de cada parcela diminui.
+      </div>
+      <div class="faq-item">
+        <strong>Este cálculo inclui seguros e taxas?</strong>
+        Não. Financiamentos reais costumam ter seguros obrigatórios e taxas administrativas que aumentam a parcela. Este resultado considera apenas o valor financiado e os juros.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-salario-liquido">Salário Líquido</a>
+        <a href="/calculadora-inss">INSS</a>
+        <a href="/calculadora-ferias">Férias</a>
+        <a href="/calculadora-rescisao">Rescisão</a>
+        <a href="/calculadora-juros-compostos">Juros Compostos</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Os cálculos são estimativas e não incluem seguros, taxas ou tarifas do contrato.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // FINANCIAMENTO — Tabela Price
+    // Cálculo em CENTAVOS INTEIROS para a tabela fechar certinho.
+    // ============================================================
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    let ultimaTabela = []; // guarda as linhas para montar sob demanda
+
+    function calcular() {
+      const valor = parseFloat(document.getElementById('valor').value) || 0;
+      let taxa = parseFloat(document.getElementById('taxa').value) || 0;
+      const periodoTaxa = document.getElementById('periodo-taxa').value;
+      const n = parseInt(document.getElementById('parcelas').value) || 1;
+
+      // Taxa anual -> mensal equivalente (composta)
+      let i = taxa / 100;
+      if (periodoTaxa === 'anual') {
+        i = Math.pow(1 + taxa / 100, 1 / 12) - 1;
+      }
+
+      // Tudo em centavos inteiros
+      const principalCents = Math.round(valor * 100);
+
+      // Parcela fixa (Price)
+      let pmtCents;
+      if (i === 0) {
+        pmtCents = Math.round(principalCents / n);
+      } else {
+        const pmtReais = (principalCents / 100) * i / (1 - Math.pow(1 + i, -n));
+        pmtCents = Math.round(pmtReais * 100);
+      }
+
+      // Monta tabela de amortização em centavos
+      let saldo = principalCents;
+      let totalJuros = 0;
+      const linhas = [];
+      for (let k = 1; k <= n; k++) {
+        let jurosCents = Math.round(saldo * i);
+        let amortCents = pmtCents - jurosCents;
+        let parcelaCents = pmtCents;
+
+        // Última parcela: zera o saldo exatamente (absorve arredondamentos)
+        if (k === n) {
+          amortCents = saldo;
+          parcelaCents = amortCents + jurosCents;
+        }
+
+        saldo -= amortCents;
+        totalJuros += jurosCents;
+
+        linhas.push({
+          k,
+          parcela: parcelaCents / 100,
+          juros: jurosCents / 100,
+          amort: amortCents / 100,
+          saldo: saldo / 100
+        });
+      }
+
+      ultimaTabela = linhas;
+
+      // Exibe resumo
+      document.getElementById('parcela').textContent = fmt.format(pmtCents / 100);
+      document.getElementById('total-pago').textContent = fmt.format((principalCents + totalJuros) / 100);
+      document.getElementById('total-juros').textContent = fmt.format(totalJuros / 100);
+      document.getElementById('result').classList.add('show');
+
+      // Esconde a tabela ao recalcular (evita mostrar dados antigos)
+      document.getElementById('tabela-wrap').style.display = 'none';
+      document.getElementById('toggle-tabela').textContent = 'Ver tabela de amortização';
+    }
+
+    function montarTabela() {
+      const tbody = document.getElementById('tabela-body');
+      // Usa innerHTML montado em string só uma vez (rápido mesmo com 360 linhas)
+      let html = '';
+      for (const l of ultimaTabela) {
+        html += `<tr>
+          <td>${l.k}</td>
+          <td>${fmt.format(l.parcela)}</td>
+          <td>${fmt.format(l.juros)}</td>
+          <td>${fmt.format(l.amort)}</td>
+          <td>${fmt.format(l.saldo)}</td>
+        </tr>`;
+      }
+      tbody.innerHTML = html;
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+
+    document.getElementById('toggle-tabela').addEventListener('click', function () {
+      const wrap = document.getElementById('tabela-wrap');
+      if (wrap.style.display === 'none') {
+        if (document.getElementById('tabela-body').children.length === 0
+            || document.getElementById('tabela-body').children.length !== ultimaTabela.length) {
+          montarTabela();
+        }
+        wrap.style.display = 'block';
+        this.textContent = 'Ocultar tabela de amortização';
+      } else {
+        wrap.style.display = 'none';
+        this.textContent = 'Ver tabela de amortização';
+      }
+    });
+
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+    });
+
+    calcular();
+  </script>
+</body>
+</html>

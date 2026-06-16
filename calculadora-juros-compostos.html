@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO: título e descrição com o termo que as pessoas pesquisam -->
+  <title>Calculadora de Juros Compostos | Simule seus investimentos</title>
+  <meta name="description" content="Calculadora de juros compostos gratuita. Simule o crescimento do seu dinheiro com aportes mensais, taxa de juros e prazo. Veja quanto vai render mês a mês.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-juros-compostos">
+
+  <!-- SEO: compartilhamento em redes sociais -->
+  <meta property="og:title" content="Calculadora de Juros Compostos">
+  <meta property="og:description" content="Simule o crescimento do seu dinheiro com juros compostos e aportes mensais.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* ============================================================
+       CSS BASE — reaproveite este bloco em TODAS as ferramentas.
+       Só muda o conteúdo do <body> de cada página.
+       ============================================================ */
+
+    :root {
+      --bg: #0f1115;
+      --surface: #181b22;
+      --surface-2: #1f232c;
+      --border: #2a2f3a;
+      --text: #e8eaed;
+      --text-dim: #9aa0ab;
+      --accent: #4ade80;       /* verde — combina com "dinheiro crescendo" */
+      --accent-dim: #22c55e;
+      --radius: 14px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container { width: 100%; max-width: 760px; }
+
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+
+    /* Card da ferramenta */
+    .tool {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #06210f;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    button:hover { background: var(--accent-dim); }
+
+    /* Resultado */
+    .result {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+
+    .result.show { display: block; }
+
+    .result-main {
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+
+    .result-value {
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .breakdown-item {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 0.9rem;
+      text-align: center;
+    }
+
+    .breakdown-item .v { font-size: 1.15rem; font-weight: 700; }
+    .breakdown-item .l { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    /* SEO: conteúdo de contexto — escreva UMA vez por ferramenta */
+    .content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .content h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .content h2:first-child { margin-top: 0; }
+
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+
+    footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      padding: 1rem 0 2rem;
+    }
+
+    @media (max-width: 480px) {
+      .row, .breakdown { grid-template-columns: 1fr; }
+    }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de Juros Compostos</h1>
+      <p class="subtitle">Simule o crescimento do seu dinheiro ao longo do tempo</p>
+    </header>
+
+    <!-- ===== A FERRAMENTA ===== -->
+    <section class="tool" aria-label="Calculadora">
+      <div class="field">
+        <label for="inicial">Valor inicial (R$)</label>
+        <input type="number" id="inicial" placeholder="1000" value="1000" min="0" step="0.01">
+      </div>
+
+      <div class="field">
+        <label for="aporte">Aporte mensal (R$)</label>
+        <input type="number" id="aporte" placeholder="200" value="200" min="0" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="taxa">Taxa de juros (%)</label>
+          <input type="number" id="taxa" placeholder="1" value="1" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="periodo-taxa">Período da taxa</label>
+          <select id="periodo-taxa">
+            <option value="mensal">Mensal</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="prazo">Prazo</label>
+          <input type="number" id="prazo" placeholder="12" value="12" min="1" step="1">
+        </div>
+        <div class="field">
+          <label for="periodo-prazo">Unidade do prazo</label>
+          <select id="periodo-prazo">
+            <option value="meses">Meses</option>
+            <option value="anos">Anos</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="calcular">Calcular</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Valor total final</div>
+          <div class="result-value" id="total">R$ 0,00</div>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <div class="v" id="investido">R$ 0,00</div>
+            <div class="l">Total investido</div>
+          </div>
+          <div class="breakdown-item">
+            <div class="v" id="juros" style="color: var(--accent);">R$ 0,00</div>
+            <div class="l">Juros ganhos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTEÚDO DE CONTEXTO (SEO) ===== -->
+    <article class="content">
+      <h2>O que são juros compostos?</h2>
+      <p>Juros compostos são os juros que incidem não só sobre o valor inicial investido, mas também sobre os juros acumulados nos períodos anteriores. Em outras palavras, é quando o seu dinheiro rende, e esse rendimento passa a render também. Por isso costumam ser chamados de "juros sobre juros".</p>
+      <p>É o efeito que faz pequenos aportes mensais se transformarem em valores expressivos no longo prazo, principalmente quando você reinveste os ganhos em vez de retirá-los.</p>
+
+      <h2>Como usar esta calculadora</h2>
+      <p>Informe o valor que você já tem hoje (valor inicial), quanto pretende guardar todo mês (aporte mensal), a taxa de juros do investimento e por quanto tempo o dinheiro vai ficar aplicado. A calculadora mostra o valor final, quanto você de fato investiu e quanto veio dos juros.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>A taxa é mensal ou anual?</strong>
+        Você escolhe. Investimentos costumam divulgar a taxa de formas diferentes — selecione a opção correspondente para o cálculo ficar correto.
+      </div>
+      <div class="faq-item">
+        <strong>Os aportes entram com juros?</strong>
+        Sim. Cada aporte mensal passa a render juros a partir do mês em que é feito, somando-se ao montante.
+      </div>
+      <div class="faq-item">
+        <strong>Esta calculadora considera impostos?</strong>
+        Não. O resultado é o rendimento bruto. Investimentos como CDB e Tesouro têm desconto de Imposto de Renda sobre os juros, que varia conforme o prazo.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-salario-liquido">Salário Líquido</a>
+        <a href="/calculadora-inss">INSS</a>
+        <a href="/calculadora-ferias">Férias</a>
+        <a href="/calculadora-rescisao">Rescisão</a>
+        <a href="/calculadora-financiamento">Financiamento</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Os cálculos são estimativas e não consideram impostos ou taxas.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // LÓGICA DA CALCULADORA — juros compostos com aportes mensais
+    // ============================================================
+
+    const fmt = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+
+    function calcular() {
+      const inicial = parseFloat(document.getElementById('inicial').value) || 0;
+      const aporte  = parseFloat(document.getElementById('aporte').value) || 0;
+      let taxa      = parseFloat(document.getElementById('taxa').value) || 0;
+      const periodoTaxa  = document.getElementById('periodo-taxa').value;
+      let prazo     = parseInt(document.getElementById('prazo').value) || 0;
+      const periodoPrazo = document.getElementById('periodo-prazo').value;
+
+      // Normaliza tudo para base MENSAL
+      // Taxa anual -> mensal equivalente (juros compostos)
+      let taxaMensal = taxa / 100;
+      if (periodoTaxa === 'anual') {
+        taxaMensal = Math.pow(1 + taxa / 100, 1 / 12) - 1;
+      }
+
+      // Prazo em meses
+      const meses = periodoPrazo === 'anos' ? prazo * 12 : prazo;
+
+      // Cálculo mês a mês
+      let montante = inicial;
+      for (let i = 0; i < meses; i++) {
+        montante = montante * (1 + taxaMensal); // rende
+        montante += aporte;                     // aporte do mês
+      }
+
+      const investido = inicial + aporte * meses;
+      const juros = montante - investido;
+
+      // Exibe
+      document.getElementById('total').textContent = fmt.format(montante);
+      document.getElementById('investido').textContent = fmt.format(investido);
+      document.getElementById('juros').textContent = fmt.format(juros);
+      document.getElementById('result').classList.add('show');
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+
+    // Permite calcular apertando Enter em qualquer campo
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') calcular();
+      });
+    });
+
+    // Calcula já na abertura com os valores de exemplo
+    calcular();
+  </script>
+</body>
+</html>

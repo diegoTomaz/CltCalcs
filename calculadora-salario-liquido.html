@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculadora de Salário Líquido 2026 | Desconto INSS e IRRF</title>
+  <meta name="description" content="Calculadora de salário líquido 2026 gratuita. Descubra quanto você recebe na conta após os descontos de INSS e Imposto de Renda, já com as novas regras de isenção até R$ 5.000.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-salario-liquido">
+
+  <meta property="og:title" content="Calculadora de Salário Líquido 2026">
+  <meta property="og:description" content="Calcule seu salário líquido com os descontos de INSS e IRRF de 2026.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* CSS BASE — idêntico às outras ferramentas */
+    :root {
+      --bg: #0f1115; --surface: #181b22; --surface-2: #1f232c; --border: #2a2f3a;
+      --text: #e8eaed; --text-dim: #9aa0ab; --accent: #4ade80; --accent-dim: #22c55e;
+      --radius: 14px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.6; padding: 1.25rem; display: flex; flex-direction: column; align-items: center;
+    }
+    .container { width: 100%; max-width: 760px; }
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+    .tool {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .field { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.4rem; font-weight: 500; }
+    input, select {
+      width: 100%; padding: 0.75rem 0.9rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+      font-size: 1rem; font-family: inherit; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    button {
+      width: 100%; padding: 0.85rem; background: var(--accent); color: #06210f;
+      border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s;
+    }
+    button:hover { background: var(--accent-dim); }
+    .result { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: none; }
+    .result.show { display: block; }
+    .result-main { text-align: center; margin-bottom: 1.25rem; }
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+    .result-value { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+
+    /* Demonstrativo de descontos */
+    .demonstrativo { margin-top: 1.25rem; background: var(--surface-2); border-radius: 10px; padding: 0.5rem 0.25rem; }
+    .linha { display: flex; justify-content: space-between; padding: 0.6rem 0.9rem; font-size: 0.92rem; border-bottom: 1px solid var(--border); }
+    .linha:last-child { border-bottom: none; }
+    .linha .desc { color: var(--text-dim); }
+    .linha .val { font-weight: 600; }
+    .linha.desconto .val { color: #f87171; }
+    .linha.total { font-size: 1.05rem; }
+    .linha.total .val { color: var(--accent); }
+
+    .content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.6rem; margin-bottom: 2rem;
+    }
+    .content h2 { font-size: 1.25rem; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+    footer { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 1rem 0 2rem; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de Salário Líquido 2026</h1>
+      <p class="subtitle">Quanto cai na sua conta depois dos descontos de INSS e IRRF</p>
+    </header>
+
+    <section class="tool" aria-label="Calculadora de salário líquido">
+      <div class="field">
+        <label for="salario">Salário bruto (R$)</label>
+        <input type="number" id="salario" value="3000" min="0" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="dependentes">Número de dependentes</label>
+          <input type="number" id="dependentes" value="0" min="0" step="1">
+        </div>
+        <div class="field">
+          <label for="outros">Outros descontos (R$)</label>
+          <input type="number" id="outros" value="0" min="0" step="0.01">
+        </div>
+      </div>
+
+      <button id="calcular">Calcular salário líquido</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Salário líquido</div>
+          <div class="result-value" id="liquido">R$ 0,00</div>
+        </div>
+
+        <div class="demonstrativo" id="demonstrativo"></div>
+      </div>
+    </section>
+
+    <article class="content">
+      <h2>Como é calculado o salário líquido em 2026</h2>
+      <p>O salário líquido é o que sobra do salário bruto depois dos descontos obrigatórios. O cálculo segue uma ordem: primeiro desconta-se o INSS, calculado pela tabela progressiva; depois o Imposto de Renda (IRRF), que incide sobre o salário já sem o INSS e sem as deduções por dependente.</p>
+      <p>Em 2026 entrou em vigor a Lei 15.270/2025, que ampliou a isenção do Imposto de Renda: quem ganha até R$ 5.000 por mês fica isento, e há uma redução gradual do imposto para rendas entre R$ 5.000,01 e R$ 7.350,00.</p>
+
+      <h2>Como usar a calculadora</h2>
+      <p>Informe o salário bruto, o número de dependentes (cada um reduz a base do Imposto de Renda) e outros descontos fixos que você tenha, como vale-transporte ou plano de saúde. A calculadora mostra o líquido e o demonstrativo completo de cada desconto.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>Quem ganha até R$ 5.000 paga Imposto de Renda?</strong>
+        Não. Pela regra de 2026, rendas mensais de até R$ 5.000 ficam isentas de IRRF por meio de um redutor que zera o imposto. Ainda assim, o INSS continua sendo descontado normalmente.
+      </div>
+      <div class="faq-item">
+        <strong>Esta calculadora usa o desconto simplificado?</strong>
+        Sim. Ela aplica automaticamente o método mais vantajoso para você — entre o desconto simplificado mensal e as deduções legais (INSS + dependentes) — exatamente como a folha de pagamento faz.
+      </div>
+      <div class="faq-item">
+        <strong>O resultado considera FGTS?</strong>
+        Não. O FGTS (8%) não é descontado do seu salário — ele é pago pela empresa por fora, então não reduz o líquido que você recebe.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-inss">INSS</a>
+        <a href="/calculadora-ferias">Férias</a>
+        <a href="/calculadora-rescisao">Rescisão</a>
+        <a href="/calculadora-juros-compostos">Juros Compostos</a>
+        <a href="/calculadora-financiamento">Financiamento</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Cálculo conforme tabelas INSS e IRRF vigentes em 2026 (Lei 15.270/2025). Confira sempre seu holerite oficial.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // SALÁRIO LÍQUIDO 2026
+    // INSS (Portaria MPS/MF 26/2026) + IRRF (Lei 15.270/2025)
+    // Validado contra os 3 exemplos oficiais da Receita Federal.
+    // Cálculo em CENTAVOS inteiros.
+    // ⚠️ ATUALIZAR ANUALMENTE: faixas INSS, faixas/parcelas IRRF,
+    //    desconto simplificado e parâmetros do redutor mudam todo ano.
+    // ============================================================
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // --- INSS 2026 (centavos) ---
+    const FAIXAS_INSS = [
+      { limite: 162100, aliq: 0.075 },
+      { limite: 290284, aliq: 0.09  },
+      { limite: 435427, aliq: 0.12  },
+      { limite: 847555, aliq: 0.14  },
+    ];
+    const TETO_INSS_DESCONTO = 98809; // R$ 988,09
+
+    function calcINSS(scCents) {
+      if (scCents > 847555) scCents = 847555;
+      let total = 0, anterior = 0;
+      for (const f of FAIXAS_INSS) {
+        if (scCents > anterior) {
+          total += Math.round((Math.min(scCents, f.limite) - anterior) * f.aliq);
+          anterior = f.limite;
+        } else break;
+      }
+      if (total > TETO_INSS_DESCONTO) total = TETO_INSS_DESCONTO;
+      return total;
+    }
+
+    // --- IRRF 2026 tabela progressiva (centavos) ---
+    // Parcelas a deduzir OFICIAIS da Receita Federal
+    function calcIRRFTabela(baseCents) {
+      let aliq, ded;
+      if (baseCents <= 242880) return 0;            // isento até 2.428,80
+      else if (baseCents <= 282665) { aliq = 0.075; ded = 18216; }  // 182,16
+      else if (baseCents <= 375105) { aliq = 0.15;  ded = 39416; }  // 394,16
+      else if (baseCents <= 466468) { aliq = 0.225; ded = 67549; }  // 675,49
+      else { aliq = 0.275; ded = 90873; }                           // 908,73
+      const imp = Math.round(baseCents * aliq) - ded;
+      return imp > 0 ? imp : 0;
+    }
+
+    const DESCONTO_SIMPLIFICADO = 60720;   // R$ 607,20
+    const DEDUCAO_DEPENDENTE   = 18959;    // R$ 189,59
+    const REDUTOR_ISENCAO_MAX  = 31289;    // R$ 312,89 (renda até 5.000)
+    const REDUTOR_BASE         = 978.62;   // fórmula faixa intermediária
+    const REDUTOR_COEF         = 0.133145;
+
+    function calcular() {
+      const salarioReais = parseFloat(document.getElementById('salario').value) || 0;
+      const dependentes  = parseInt(document.getElementById('dependentes').value) || 0;
+      const outrosReais  = parseFloat(document.getElementById('outros').value) || 0;
+
+      const salCents = Math.round(salarioReais * 100);
+      const outrosCents = Math.round(outrosReais * 100);
+
+      // 1) INSS
+      const inssCents = calcINSS(salCents);
+
+      // 2) Base de cálculo do IRRF — usa o método mais vantajoso (menor imposto)
+      const baseLegal = salCents - inssCents - dependentes * DEDUCAO_DEPENDENTE;
+      const baseSimpl = salCents - DESCONTO_SIMPLIFICADO;
+      let base = Math.min(baseLegal, baseSimpl);
+      if (base < 0) base = 0;
+
+      // 3) IRRF pela tabela
+      const irrfTabela = calcIRRFTabela(base);
+
+      // 4) Redutor 2026 (Lei 15.270/2025)
+      let redutor = 0;
+      if (salCents <= 500000) {
+        redutor = REDUTOR_ISENCAO_MAX;
+      } else if (salCents <= 735000) {
+        const r = REDUTOR_BASE - REDUTOR_COEF * salarioReais;
+        redutor = Math.round(r * 100);
+        if (redutor < 0) redutor = 0;
+      }
+      if (redutor > irrfTabela) redutor = irrfTabela; // limitado ao imposto
+      const irrfCents = irrfTabela - redutor;
+
+      // 5) Líquido
+      const liquidoCents = salCents - inssCents - irrfCents - outrosCents;
+
+      // Exibe
+      document.getElementById('liquido').textContent = fmt.format(liquidoCents / 100);
+
+      const linhas = [
+        { desc: 'Salário bruto', val: salCents, tipo: '' },
+        { desc: 'INSS', val: -inssCents, tipo: 'desconto' },
+        { desc: 'Imposto de Renda (IRRF)', val: -irrfCents, tipo: 'desconto' },
+      ];
+      if (outrosCents > 0) linhas.push({ desc: 'Outros descontos', val: -outrosCents, tipo: 'desconto' });
+      linhas.push({ desc: 'Salário líquido', val: liquidoCents, tipo: 'total' });
+
+      document.getElementById('demonstrativo').innerHTML = linhas.map(l =>
+        `<div class="linha ${l.tipo}">
+          <span class="desc">${l.desc}</span>
+          <span class="val">${l.val < 0 ? '− ' : ''}${fmt.format(Math.abs(l.val) / 100)}</span>
+        </div>`
+      ).join('');
+
+      document.getElementById('result').classList.add('show');
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+    });
+
+    calcular();
+  </script>
+</body>
+</html>

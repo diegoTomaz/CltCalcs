@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculadora de Rescisão 2026 | Verbas, aviso prévio e multa do FGTS</title>
+  <meta name="description" content="Calculadora de rescisão trabalhista 2026 gratuita. Calcule saldo de salário, aviso prévio, 13º e férias proporcionais, multa de 40% do FGTS e os descontos, por motivo do desligamento.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-rescisao">
+
+  <meta property="og:title" content="Calculadora de Rescisão Trabalhista 2026">
+  <meta property="og:description" content="Calcule suas verbas rescisórias conforme o motivo do desligamento.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* CSS BASE — idêntico às outras ferramentas */
+    :root {
+      --bg: #0f1115; --surface: #181b22; --surface-2: #1f232c; --border: #2a2f3a;
+      --text: #e8eaed; --text-dim: #9aa0ab; --accent: #4ade80; --accent-dim: #22c55e;
+      --radius: 14px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.6; padding: 1.25rem; display: flex; flex-direction: column; align-items: center;
+    }
+    .container { width: 100%; max-width: 760px; }
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+    .tool {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .field { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.4rem; font-weight: 500; }
+    input, select {
+      width: 100%; padding: 0.75rem 0.9rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+      font-size: 1rem; font-family: inherit; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .checkbox-field { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.1rem; }
+    .checkbox-field input { width: auto; }
+    .checkbox-field label { margin: 0; color: var(--text); }
+    button {
+      width: 100%; padding: 0.85rem; background: var(--accent); color: #06210f;
+      border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s;
+    }
+    button:hover { background: var(--accent-dim); }
+    .result { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: none; }
+    .result.show { display: block; }
+    .result-main { text-align: center; margin-bottom: 1.25rem; }
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+    .result-value { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+
+    .grupo-titulo { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin: 1.25rem 0 0.5rem 0.25rem; }
+    .demonstrativo { background: var(--surface-2); border-radius: 10px; padding: 0.5rem 0.25rem; }
+    .linha { display: flex; justify-content: space-between; padding: 0.55rem 0.9rem; font-size: 0.92rem; border-bottom: 1px solid var(--border); }
+    .linha:last-child { border-bottom: none; }
+    .linha .desc { color: var(--text-dim); }
+    .linha .val { font-weight: 600; }
+    .linha.desconto .val { color: #f87171; }
+    .linha.total { font-size: 1.05rem; }
+    .linha.total .val { color: var(--accent); }
+    .fgts-box { margin-top: 1rem; padding: 0.9rem 1rem; background: rgba(74,222,128,0.08); border: 1px solid var(--border); border-radius: 10px; font-size: 0.88rem; color: var(--text-dim); }
+    .fgts-box strong { color: var(--text); }
+
+    .content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.6rem; margin-bottom: 2rem;
+    }
+    .content h2 { font-size: 1.25rem; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+    footer { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 1rem 0 2rem; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de Rescisão 2026</h1>
+      <p class="subtitle">Suas verbas rescisórias conforme o motivo do desligamento</p>
+    </header>
+
+    <section class="tool" aria-label="Calculadora de rescisão">
+      <div class="field">
+        <label for="motivo">Motivo do desligamento</label>
+        <select id="motivo">
+          <option value="sem_justa">Demissão sem justa causa</option>
+          <option value="pedido">Pedido de demissão</option>
+          <option value="justa">Demissão por justa causa</option>
+          <option value="acordo">Rescisão por acordo (distrato)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="salario">Salário bruto mensal (R$)</label>
+        <input type="number" id="salario" value="3000" min="0" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="anos">Anos completos na empresa</label>
+          <input type="number" id="anos" value="2" min="0" step="1">
+        </div>
+        <div class="field">
+          <label for="dias-trabalhados">Dias trabalhados no mês da saída</label>
+          <input type="number" id="dias-trabalhados" value="15" min="0" max="30" step="1">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="meses-13">Meses p/ 13º e férias prop. (1–12)</label>
+          <input type="number" id="meses-13" value="6" min="0" max="12" step="1">
+        </div>
+        <div class="field">
+          <label for="dependentes">Dependentes</label>
+          <input type="number" id="dependentes" value="0" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="ferias-vencidas">
+        <label for="ferias-vencidas">Tenho férias vencidas (período já adquirido e não gozado)</label>
+      </div>
+
+      <div class="field">
+        <label for="saldo-fgts">Saldo atual do FGTS (R$) — opcional, p/ calcular a multa</label>
+        <input type="number" id="saldo-fgts" value="0" min="0" step="0.01">
+      </div>
+
+      <button id="calcular">Calcular rescisão</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Valor líquido a receber</div>
+          <div class="result-value" id="liquido">R$ 0,00</div>
+        </div>
+        <div id="demonstrativo-container"></div>
+        <div class="fgts-box" id="fgts-box"></div>
+      </div>
+    </section>
+
+    <article class="content">
+      <h2>Como a rescisão muda conforme o motivo</h2>
+      <p>O valor da rescisão depende diretamente de como o contrato termina. Na demissão sem justa causa, o trabalhador recebe o pacote completo. No pedido de demissão, perde o aviso prévio indenizado, a multa do FGTS e o saque do fundo. Na justa causa, fica apenas com o saldo de salário e as férias vencidas. Já no acordo entre as partes, recebe metade do aviso e multa de 20% (em vez de 40%).</p>
+
+      <h2>As principais verbas</h2>
+      <p>Saldo de salário é o pagamento dos dias trabalhados no mês da saída. O aviso prévio é de 30 dias mais 3 dias por ano completo, limitado a 90 dias. O 13º e as férias proporcionais correspondem aos meses trabalhados no ano (1/12 por mês). Sobre as férias soma-se sempre o terço constitucional. A multa do FGTS, quando devida, é de 40% sobre todo o saldo depositado no contrato.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>Quais verbas têm desconto de imposto?</strong>
+        De forma geral, INSS e IRRF incidem sobre saldo de salário, 13º e (no caso do IRRF) férias proporcionais. Verbas indenizatórias — aviso prévio indenizado, férias indenizadas com 1/3 e multa do FGTS — costumam ser isentas.
+      </div>
+      <div class="faq-item">
+        <strong>A multa do FGTS entra no valor que recebo na rescisão?</strong>
+        Não diretamente. O FGTS e a multa de 40% são liberados para saque na conta vinculada do fundo, separados das verbas pagas pela empresa. Por isso a calculadora mostra esse valor à parte.
+      </div>
+      <div class="faq-item">
+        <strong>Este cálculo substitui o cálculo oficial?</strong>
+        Não. É uma estimativa. O valor real depende de convenção coletiva, horas extras habituais, adicionais e da data exata da saída. Sempre confira o termo de rescisão oficial.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-salario-liquido">Salário Líquido</a>
+        <a href="/calculadora-inss">INSS</a>
+        <a href="/calculadora-ferias">Férias</a>
+        <a href="/calculadora-juros-compostos">Juros Compostos</a>
+        <a href="/calculadora-financiamento">Financiamento</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Estimativa conforme regras trabalhistas e tabelas de 2026. Não substitui o cálculo oficial nem orientação de um advogado.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // RESCISÃO 2026
+    // Reaproveita INSS (Portaria 26/2026) e IRRF (Lei 15.270/2025).
+    // Verbas variam conforme o motivo do desligamento.
+    // Cálculo em CENTAVOS inteiros.
+    //
+    // Incidência de impostos (interpretação consolidada):
+    //  - INSS: saldo de salário + 13º proporcional
+    //  - IRRF: saldo de salário + 13º + férias proporcionais
+    //  - Isentos: aviso prévio indenizado, férias indenizadas + 1/3, multa FGTS
+    // ⚠️ ATUALIZAR ANUALMENTE junto com as tabelas INSS/IRRF.
+    // ============================================================
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    const FAIXAS_INSS = [
+      { limite: 162100, aliq: 0.075 }, { limite: 290284, aliq: 0.09 },
+      { limite: 435427, aliq: 0.12 },  { limite: 847555, aliq: 0.14 },
+    ];
+    const TETO_INSS_DESCONTO = 98809;
+
+    function calcINSS(scCents) {
+      if (scCents > 847555) scCents = 847555;
+      let total = 0, anterior = 0;
+      for (const f of FAIXAS_INSS) {
+        if (scCents > anterior) {
+          total += Math.round((Math.min(scCents, f.limite) - anterior) * f.aliq);
+          anterior = f.limite;
+        } else break;
+      }
+      if (total > TETO_INSS_DESCONTO) total = TETO_INSS_DESCONTO;
+      return total;
+    }
+
+    function calcIRRFTabela(baseCents) {
+      let aliq, ded;
+      if (baseCents <= 242880) return 0;
+      else if (baseCents <= 282665) { aliq = 0.075; ded = 18216; }
+      else if (baseCents <= 375105) { aliq = 0.15;  ded = 39416; }
+      else if (baseCents <= 466468) { aliq = 0.225; ded = 67549; }
+      else { aliq = 0.275; ded = 90873; }
+      const imp = Math.round(baseCents * aliq) - ded;
+      return imp > 0 ? imp : 0;
+    }
+
+    const DESCONTO_SIMPLIFICADO = 60720;
+    const DEDUCAO_DEPENDENTE = 18959;
+
+    function calcular() {
+      const motivo = document.getElementById('motivo').value;
+      const salarioReais = parseFloat(document.getElementById('salario').value) || 0;
+      const anos = parseInt(document.getElementById('anos').value) || 0;
+      let diasTrab = parseInt(document.getElementById('dias-trabalhados').value) || 0;
+      if (diasTrab > 30) diasTrab = 30;
+      let meses = parseInt(document.getElementById('meses-13').value) || 0;
+      if (meses > 12) meses = 12;
+      const dependentes = parseInt(document.getElementById('dependentes').value) || 0;
+      const temFeriasVencidas = document.getElementById('ferias-vencidas').checked;
+      const saldoFgtsReais = parseFloat(document.getElementById('saldo-fgts').value) || 0;
+
+      const sal = Math.round(salarioReais * 100);
+      const diaria = sal / 30;
+      const avoMensal = sal / 12;
+
+      // --- Regras por motivo ---
+      // Define quais verbas entram
+      let temAviso = false, temDecimoProp = false, temFeriasProp = false;
+      let multaPct = 0, avisoMetade = false;
+
+      if (motivo === 'sem_justa') {
+        temAviso = true; temDecimoProp = true; temFeriasProp = true; multaPct = 0.40;
+      } else if (motivo === 'pedido') {
+        temAviso = false; temDecimoProp = true; temFeriasProp = true; multaPct = 0;
+      } else if (motivo === 'justa') {
+        temAviso = false; temDecimoProp = false; temFeriasProp = false; multaPct = 0;
+      } else if (motivo === 'acordo') {
+        temAviso = true; avisoMetade = true; temDecimoProp = true; temFeriasProp = true; multaPct = 0.20;
+      }
+
+      // --- Verbas TRIBUTÁVEIS ---
+      // Saldo de salário (sempre)
+      const saldo = Math.round(diaria * diasTrab);
+      // 13º proporcional
+      const decimo = temDecimoProp ? Math.round(avoMensal * meses) : 0;
+
+      // --- Verbas tributáveis para INSS: saldo + 13º (tratados em bases separadas) ---
+      // INSS do saldo (mês) e INSS do 13º são apurados separadamente
+      const inssSaldo = calcINSS(saldo);
+      const inssDecimo = decimo > 0 ? calcINSS(decimo) : 0;
+      const inssTotal = inssSaldo + inssDecimo;
+
+      // --- Verbas indenizatórias (ISENTAS) ---
+      // Aviso prévio
+      let avisoDias = 0, aviso = 0;
+      if (temAviso) {
+        avisoDias = 30 + anos * 3;
+        if (avisoDias > 90) avisoDias = 90;
+        if (avisoMetade) avisoDias = Math.round(avisoDias / 2);
+        aviso = Math.round(diaria * avisoDias);
+      }
+      // Férias proporcionais + 1/3 (isentas — natureza indenizatória na rescisão)
+      let feriasProp = 0, tercoProp = 0;
+      if (temFeriasProp) {
+        feriasProp = Math.round(avoMensal * meses);
+        tercoProp = Math.round(feriasProp / 3);
+      }
+      // Férias vencidas + 1/3 (isentas — devidas em qualquer motivo, inclusive justa causa)
+      let feriasVenc = 0, tercoVenc = 0;
+      if (temFeriasVencidas) {
+        feriasVenc = sal;
+        tercoVenc = Math.round(sal / 3);
+      }
+
+      // --- IRRF ---
+      // Base IRRF do saldo de salário (verba mensal) — com método mais vantajoso
+      const baseLegalSaldo = saldo - inssSaldo - dependentes * DEDUCAO_DEPENDENTE;
+      const baseSimplSaldo = saldo - DESCONTO_SIMPLIFICADO;
+      let baseIRSaldo = Math.min(baseLegalSaldo, baseSimplSaldo);
+      if (baseIRSaldo < 0) baseIRSaldo = 0;
+      const irrfSaldo = calcIRRFTabela(baseIRSaldo);
+
+      // Base IRRF do 13º (tributado em separado, base própria)
+      let irrfDecimo = 0;
+      if (decimo > 0) {
+        let base13 = decimo - inssDecimo - dependentes * DEDUCAO_DEPENDENTE;
+        if (base13 < 0) base13 = 0;
+        irrfDecimo = calcIRRFTabela(base13);
+      }
+      const irrfTotal = irrfSaldo + irrfDecimo;
+
+      // --- Totais ---
+      const totalBruto = saldo + decimo + aviso + feriasProp + tercoProp + feriasVenc + tercoVenc;
+      const totalDescontos = inssTotal + irrfTotal;
+      const liquido = totalBruto - totalDescontos;
+
+      // FGTS multa (à parte — vai para a conta do FGTS, não soma ao líquido)
+      const saldoFgts = Math.round(saldoFgtsReais * 100);
+      const multaFgts = Math.round(saldoFgts * multaPct);
+
+      // --- Exibição ---
+      document.getElementById('liquido').textContent = fmt.format(liquido / 100);
+
+      let html = '<div class="grupo-titulo">Verbas a receber</div><div class="demonstrativo">';
+      const verbas = [
+        { d: `Saldo de salário (${diasTrab} dias)`, v: saldo },
+      ];
+      if (decimo > 0) verbas.push({ d: `13º proporcional (${meses}/12)`, v: decimo });
+      if (feriasProp > 0) verbas.push({ d: `Férias proporcionais (${meses}/12)`, v: feriasProp });
+      if (tercoProp > 0) verbas.push({ d: 'Terço sobre férias proporcionais', v: tercoProp });
+      if (feriasVenc > 0) verbas.push({ d: 'Férias vencidas', v: feriasVenc });
+      if (tercoVenc > 0) verbas.push({ d: 'Terço sobre férias vencidas', v: tercoVenc });
+      if (aviso > 0) verbas.push({ d: `Aviso prévio (${avisoDias} dias)`, v: aviso });
+
+      html += verbas.map(x =>
+        `<div class="linha"><span class="desc">${x.d}</span><span class="val">${fmt.format(x.v / 100)}</span></div>`
+      ).join('');
+      html += `<div class="linha total"><span class="desc">Total bruto</span><span class="val">${fmt.format(totalBruto / 100)}</span></div>`;
+      html += '</div>';
+
+      html += '<div class="grupo-titulo">Descontos</div><div class="demonstrativo">';
+      html += `<div class="linha desconto"><span class="desc">INSS</span><span class="val">− ${fmt.format(inssTotal / 100)}</span></div>`;
+      html += `<div class="linha desconto"><span class="desc">IRRF</span><span class="val">− ${fmt.format(irrfTotal / 100)}</span></div>`;
+      html += `<div class="linha total"><span class="desc">Líquido a receber</span><span class="val">${fmt.format(liquido / 100)}</span></div>`;
+      html += '</div>';
+
+      document.getElementById('demonstrativo-container').innerHTML = html;
+
+      // Caixa do FGTS
+      let fgtsHtml = '';
+      if (motivo === 'justa' || motivo === 'pedido') {
+        fgtsHtml = `<strong>FGTS:</strong> neste motivo de desligamento não há multa nem saque do FGTS (o saldo fica retido na conta vinculada).`;
+      } else if (saldoFgts > 0) {
+        fgtsHtml = `<strong>FGTS (à parte):</strong> multa de ${(multaPct*100).toFixed(0)}% sobre o saldo informado = <strong>${fmt.format(multaFgts / 100)}</strong>. Esse valor, mais o saldo do FGTS, é liberado na conta vinculada — não soma ao líquido acima.`;
+      } else {
+        fgtsHtml = `<strong>FGTS:</strong> você tem direito à multa de ${(multaPct*100).toFixed(0)}% sobre o saldo do FGTS. Informe o saldo do fundo no campo acima para calcular o valor da multa.`;
+      }
+      document.getElementById('fgts-box').innerHTML = fgtsHtml;
+
+      document.getElementById('result').classList.add('show');
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+    document.getElementById('motivo').addEventListener('change', calcular);
+    document.getElementById('ferias-vencidas').addEventListener('change', calcular);
+    document.querySelectorAll('input[type="number"]').forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+    });
+
+    calcular();
+  </script>
+</body>
+</html>

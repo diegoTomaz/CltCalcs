@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculadora de Férias 2026 | Valor líquido com 1/3 e abono</title>
+  <meta name="description" content="Calculadora de férias 2026 gratuita. Calcule o valor líquido das suas férias com o terço constitucional, venda de dias (abono pecuniário) e descontos de INSS e IRRF.">
+  <link rel="canonical" href="https://simulaclt.com.br/calculadora-ferias">
+
+  <meta property="og:title" content="Calculadora de Férias 2026">
+  <meta property="og:description" content="Calcule o valor líquido das suas férias com 1/3 constitucional e abono.">
+  <meta property="og:type" content="website">
+
+  <style>
+    /* CSS BASE — idêntico às outras ferramentas */
+    :root {
+      --bg: #0f1115; --surface: #181b22; --surface-2: #1f232c; --border: #2a2f3a;
+      --text: #e8eaed; --text-dim: #9aa0ab; --accent: #4ade80; --accent-dim: #22c55e;
+      --radius: 14px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.6; padding: 1.25rem; display: flex; flex-direction: column; align-items: center;
+    }
+    .container { width: 100%; max-width: 760px; }
+    header { text-align: center; margin: 1.5rem 0 2rem; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { color: var(--text-dim); margin-top: 0.5rem; font-size: 1rem; }
+    .tool {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .field { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.4rem; font-weight: 500; }
+    input, select {
+      width: 100%; padding: 0.75rem 0.9rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+      font-size: 1rem; font-family: inherit; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--accent); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .checkbox-field { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.1rem; }
+    .checkbox-field input { width: auto; }
+    .checkbox-field label { margin: 0; color: var(--text); }
+    button {
+      width: 100%; padding: 0.85rem; background: var(--accent); color: #06210f;
+      border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s;
+    }
+    button:hover { background: var(--accent-dim); }
+    .result { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: none; }
+    .result.show { display: block; }
+    .result-main { text-align: center; margin-bottom: 1.25rem; }
+    .result-label { color: var(--text-dim); font-size: 0.9rem; }
+    .result-value { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+    .demonstrativo { margin-top: 1.25rem; background: var(--surface-2); border-radius: 10px; padding: 0.5rem 0.25rem; }
+    .linha { display: flex; justify-content: space-between; padding: 0.6rem 0.9rem; font-size: 0.92rem; border-bottom: 1px solid var(--border); }
+    .linha:last-child { border-bottom: none; }
+    .linha .desc { color: var(--text-dim); }
+    .linha .val { font-weight: 600; }
+    .linha.desconto .val { color: #f87171; }
+    .linha.isento .val { color: var(--accent); }
+    .linha.total { font-size: 1.05rem; }
+    .linha.total .val { color: var(--accent); }
+    .content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.6rem; margin-bottom: 2rem;
+    }
+    .content h2 { font-size: 1.25rem; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { color: var(--text-dim); margin-bottom: 0.9rem; }
+    .faq-item { margin-bottom: 1rem; }
+    .faq-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+    footer { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 1rem 0 2rem; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* ===== Navegação (topbar + relacionadas) ===== */
+    .topbar { width: 100%; max-width: 760px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+    .topbar a.brand { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .topbar a.brand:hover { color: var(--accent-dim); }
+    .relacionadas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 2rem; }
+    .relacionadas h2 { font-size: 1.05rem; margin-bottom: 0.85rem; }
+    .relacionadas .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .relacionadas a { display: inline-block; padding: 0.45rem 0.85rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.88rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .relacionadas a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="topbar"><a class="brand" href="/">← SimulaCLT</a></nav>
+
+    <header>
+      <h1>Calculadora de Férias 2026</h1>
+      <p class="subtitle">Quanto você recebe de férias, já com o terço e os descontos</p>
+    </header>
+
+    <section class="tool" aria-label="Calculadora de férias">
+      <div class="field">
+        <label for="salario">Salário bruto mensal (R$)</label>
+        <input type="number" id="salario" value="3000" min="0" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="dias">Dias de férias</label>
+          <input type="number" id="dias" value="30" min="1" max="30" step="1">
+        </div>
+        <div class="field">
+          <label for="dependentes">Dependentes</label>
+          <input type="number" id="dependentes" value="0" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="vender">
+        <label for="vender">Vender 1/3 das férias (abono pecuniário)</label>
+      </div>
+
+      <button id="calcular">Calcular férias</button>
+
+      <div class="result" id="result">
+        <div class="result-main">
+          <div class="result-label">Valor líquido das férias</div>
+          <div class="result-value" id="liquido">R$ 0,00</div>
+        </div>
+        <div class="demonstrativo" id="demonstrativo"></div>
+      </div>
+    </section>
+
+    <article class="content">
+      <h2>Como funciona o cálculo de férias</h2>
+      <p>O valor das férias parte do salário proporcional aos dias que você vai tirar. Sobre esse valor soma-se o terço constitucional (1/3 a mais, garantido pela Constituição). É sobre esse total que incidem os descontos de INSS e Imposto de Renda.</p>
+      <p>Se você optar por vender parte das férias (o chamado abono pecuniário), pode converter até 1/3 do período — geralmente 10 dias — em dinheiro. Esse valor, mais o terço sobre ele, tem natureza indenizatória e por isso é isento de INSS e IRRF, entrando "limpo" no seu bolso.</p>
+
+      <h2>Como usar a calculadora</h2>
+      <p>Informe o salário bruto, quantos dias de férias vai gozar e o número de dependentes (cada um reduz o Imposto de Renda). Marque a opção de vender 1/3 se você pretende converter parte das férias em dinheiro. O demonstrativo mostra cada parcela e os descontos.</p>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq-item">
+        <strong>O terço constitucional também sofre desconto?</strong>
+        Sim. O terço das férias gozadas entra na base de cálculo do INSS e do IRRF, junto com o valor das férias.
+      </div>
+      <div class="faq-item">
+        <strong>Por que o abono não tem desconto?</strong>
+        Porque a venda de férias tem natureza indenizatória, não salarial. Por isso o valor vendido e o terço sobre ele são isentos de INSS e Imposto de Renda.
+      </div>
+      <div class="faq-item">
+        <strong>Vale a pena vender as férias?</strong>
+        Financeiramente, o dia vendido rende mais líquido que o dia gozado, justamente por ser isento de descontos. Mas você abre mão do descanso. É uma decisão pessoal entre dinheiro e tempo livre.
+      </div>
+    </article>
+
+    <section class="relacionadas" aria-label="Outras calculadoras">
+      <h2>Outras calculadoras</h2>
+      <div class="chips">
+        <a href="/calculadora-salario-liquido">Salário Líquido</a>
+        <a href="/calculadora-inss">INSS</a>
+        <a href="/calculadora-rescisao">Rescisão</a>
+        <a href="/calculadora-juros-compostos">Juros Compostos</a>
+        <a href="/calculadora-financiamento">Financiamento</a>
+      </div>
+    </section>
+
+    <footer>
+      Ferramenta gratuita · Cálculo conforme tabelas INSS e IRRF de 2026. Valores podem variar conforme convenção coletiva. Confira seu holerite oficial.
+    </footer>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // FÉRIAS 2026
+    // Reaproveita INSS (Portaria 26/2026) e IRRF (Lei 15.270/2025),
+    // ambos já validados contra exemplos oficiais.
+    // Abono pecuniário (venda) + seu terço = ISENTOS.
+    // Cálculo em CENTAVOS inteiros.
+    // ⚠️ ATUALIZAR ANUALMENTE junto com as tabelas INSS/IRRF.
+    // ============================================================
+
+    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    const FAIXAS_INSS = [
+      { limite: 162100, aliq: 0.075 }, { limite: 290284, aliq: 0.09 },
+      { limite: 435427, aliq: 0.12 },  { limite: 847555, aliq: 0.14 },
+    ];
+    const TETO_INSS_DESCONTO = 98809;
+
+    function calcINSS(scCents) {
+      if (scCents > 847555) scCents = 847555;
+      let total = 0, anterior = 0;
+      for (const f of FAIXAS_INSS) {
+        if (scCents > anterior) {
+          total += Math.round((Math.min(scCents, f.limite) - anterior) * f.aliq);
+          anterior = f.limite;
+        } else break;
+      }
+      if (total > TETO_INSS_DESCONTO) total = TETO_INSS_DESCONTO;
+      return total;
+    }
+
+    function calcIRRFTabela(baseCents) {
+      let aliq, ded;
+      if (baseCents <= 242880) return 0;
+      else if (baseCents <= 282665) { aliq = 0.075; ded = 18216; }
+      else if (baseCents <= 375105) { aliq = 0.15;  ded = 39416; }
+      else if (baseCents <= 466468) { aliq = 0.225; ded = 67549; }
+      else { aliq = 0.275; ded = 90873; }
+      const imp = Math.round(baseCents * aliq) - ded;
+      return imp > 0 ? imp : 0;
+    }
+
+    const DESCONTO_SIMPLIFICADO = 60720;
+    const DEDUCAO_DEPENDENTE = 18959;
+
+    function calcular() {
+      const salarioReais = parseFloat(document.getElementById('salario').value) || 0;
+      let dias = parseInt(document.getElementById('dias').value) || 0;
+      if (dias > 30) dias = 30;
+      if (dias < 1) dias = 1;
+      const dependentes = parseInt(document.getElementById('dependentes').value) || 0;
+      const vender = document.getElementById('vender').checked;
+
+      const salCents = Math.round(salarioReais * 100);
+      const diariaCents = salCents / 30; // mantém fração, arredonda no fim
+
+      // --- Férias gozadas (tributáveis) ---
+      // Se vender 1/3, goza 2/3 dos dias; senão goza todos os dias informados
+      let diasGozo = dias;
+      let diasVendidos = 0;
+      if (vender) {
+        diasVendidos = Math.round(dias / 3);   // até 1/3
+        diasGozo = dias - diasVendidos;
+      }
+
+      const feriasGozo = Math.round(diariaCents * diasGozo);
+      const tercoGozo = Math.round(feriasGozo / 3);
+      const baseTributavel = feriasGozo + tercoGozo;
+
+      // INSS sobre a base tributável
+      const inssCents = calcINSS(baseTributavel);
+
+      // IRRF — método mais vantajoso (simplificado vs deduções legais)
+      const baseLegal = baseTributavel - inssCents - dependentes * DEDUCAO_DEPENDENTE;
+      const baseSimpl = baseTributavel - DESCONTO_SIMPLIFICADO;
+      let baseIR = Math.min(baseLegal, baseSimpl);
+      if (baseIR < 0) baseIR = 0;
+      const irrfCents = calcIRRFTabela(baseIR);
+
+      // --- Abono pecuniário (isento) ---
+      let abonoCents = 0, tercoAbonoCents = 0;
+      if (vender && diasVendidos > 0) {
+        abonoCents = Math.round(diariaCents * diasVendidos);
+        tercoAbonoCents = Math.round(abonoCents / 3);
+      }
+      const abonoTotal = abonoCents + tercoAbonoCents;
+
+      // --- Líquido ---
+      const liquidoCents = baseTributavel - inssCents - irrfCents + abonoTotal;
+
+      document.getElementById('liquido').textContent = fmt.format(liquidoCents / 100);
+
+      const linhas = [
+        { desc: `Férias (${diasGozo} dias)`, val: feriasGozo, tipo: '' },
+        { desc: 'Terço constitucional (1/3)', val: tercoGozo, tipo: '' },
+      ];
+      if (abonoTotal > 0) {
+        linhas.push({ desc: `Abono — venda de ${diasVendidos} dias (isento)`, val: abonoCents, tipo: 'isento' });
+        linhas.push({ desc: 'Terço sobre o abono (isento)', val: tercoAbonoCents, tipo: 'isento' });
+      }
+      linhas.push({ desc: 'INSS', val: -inssCents, tipo: 'desconto' });
+      linhas.push({ desc: 'Imposto de Renda (IRRF)', val: -irrfCents, tipo: 'desconto' });
+      linhas.push({ desc: 'Líquido a receber', val: liquidoCents, tipo: 'total' });
+
+      document.getElementById('demonstrativo').innerHTML = linhas.map(l =>
+        `<div class="linha ${l.tipo}">
+          <span class="desc">${l.desc}</span>
+          <span class="val">${l.val < 0 ? '− ' : ''}${fmt.format(Math.abs(l.val) / 100)}</span>
+        </div>`
+      ).join('');
+
+      document.getElementById('result').classList.add('show');
+    }
+
+    document.getElementById('calcular').addEventListener('click', calcular);
+    document.getElementById('vender').addEventListener('change', calcular);
+    document.querySelectorAll('input[type="number"]').forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+    });
+
+    calcular();
+  </script>
+</body>
+</html>
